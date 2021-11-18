@@ -30,30 +30,35 @@ osMessageQueueId_t que_id;
 
 uint16_t size;
 
+uint8_t flag_error = 0;
+
 #pragma pack(push, 1)
 
 typedef struct{
 	
-	uint8_t a;
-	uint16_t b;
-	uint8_t buff[1];
-	
+  uint8_t buff[1024];
+  uint8_t buff_2[1024];
+  uint8_t buff_3[1024];
+  uint8_t buff_4[1024];
+  uint8_t buff_5[1024];
 		
 }MY_STRUCT;
 
 #pragma pack(pop)
 
+MY_STRUCT msg;
+
 //*****************************************
 const osThreadAttr_t Task1_attributes = {
   .name = "defaultTask",
   .priority = (osPriority_t) osPriorityHigh,
-  .stack_size = 1024
+  .stack_size = 128
 };
 
 const osThreadAttr_t Task2_attributes = {
   .name = "defaultTask_2",
   .priority = (osPriority_t) osPriorityNormal, //osPriorityHigh
-  .stack_size = 1024
+  .stack_size = 128
 };
 
 //*****************************************
@@ -65,7 +70,7 @@ void Task_init(void)
   Task2 = osThreadNew(StartTask2, NULL, &Task2_attributes);
   tim_periodic = osTimerNew(periodic_Callback, osTimerPeriodic,(void*) 0, NULL );
   sem_tim = osSemaphoreNew(1, 1, NULL);
-  que_id = osMessageQueueNew(MSGQUEUE_OBJECTS, sizeof(MY_STRUCT), NULL);
+  que_id = osMessageQueueNew(MSGQUEUE_OBJECTS, sizeof(uint32_t), NULL);
   
 }
 
@@ -74,20 +79,22 @@ void Task_init(void)
 
 void StartTask1(void *argument)
 {
-  osTimerStart(tim_periodic, 1000);
-	MY_STRUCT msg;
-	
+  MY_STRUCT *str;
+  
   for(;;)
   {
-		msg.a = 0x54;
-		msg.b = 0xad21;
-		msg.buff[0] = 0xdd;
-		
-		osMessageQueuePut(que_id, &msg, 0U, 0U);
-		
+    str = pvPortMalloc(sizeof(MY_STRUCT));    
+    if(str!=NULL){
+      str->buff[0] = 0x54;
+      str->buff_5[240] = 0xad;
+      osMessageQueuePut(que_id, str, 0U, osWaitForever);
+      vPortFree(str);  
+    }
+    else{
+      flag_error = 1;    //exec();      
+    }         
     osDelay(500);
-  }
-  
+  }  
 }
 
 
@@ -95,35 +102,26 @@ void StartTask1(void *argument)
 
 void StartTask2(void *argument)
 {
-  osStatus_t status_sem, staus_que;
-	MY_STRUCT msg;
-	
-  osSemaphoreAcquire(sem_tim, 0);
- 
+  osStatus_t  staus_que;
+  MY_STRUCT *str_2;
+  
   for(;;)
   {
-    status_sem = osSemaphoreAcquire(sem_tim, 0);
-    staus_que = osMessageQueueGet(que_id, &msg, 0U, 0U);
-		
-    if(status_sem == osOK){
-      
-      char *path = pvPortMalloc(100*sizeof (char));
-      
-      sprintf(path, "Hallo Alex\r\n");
-      size = sizeof(char);      
-      HAL_UART_Transmit(&huart2, (uint8_t*) path, strlen(path), 0xffff);
-      HAL_GPIO_TogglePin(GPIOA,  GPIO_PIN_5 );
-      vPortFree(path);
-      
-    }
-		else if(staus_que == osOK){
-			HAL_UART_Transmit(&huart2, (uint8_t*) &msg, sizeof(msg), 0xffff);
-		}
+    str_2 = pvPortMalloc(sizeof(MY_STRUCT));  
     
-		osDelay(500);
-    //osThreadYield(); 
-  }
-  
+		if(str_2!=NULL){
+      staus_que = osMessageQueueGet(que_id, str_2, 0U, osWaitForever);
+      if(staus_que == osOK){
+        HAL_UART_Transmit(&huart2, (uint8_t*)&str_2->buff[0], sizeof(str_2->buff[0]), 0xffff);
+        HAL_UART_Transmit(&huart2, (uint8_t*)&str_2->buff_5[240], sizeof(str_2->buff_5[240]), 0xffff);
+        vPortFree(str_2);     
+      }
+      else{
+        flag_error = 1;          
+      }      
+    }
+		osDelay(500);   
+  } 
 }
 
 //*****************************************
