@@ -109,7 +109,9 @@ int main(void)
   MX_USART2_UART_Init();
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
-
+  
+  Task_init();
+  
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -138,7 +140,9 @@ int main(void)
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   
-  Task_init();
+  
+  USER_Usart2_Init();
+  
   
   /* USER CODE END RTOS_THREADS */
 
@@ -314,20 +318,20 @@ static void MX_GPIO_Init(void)
   * @retval None
   */
 /* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument)
-{
-  /* USER CODE BEGIN 5 */
+//void StartDefaultTask(void *argument)
+//{
+//  /* USER CODE BEGIN 5 */
 //  /* Infinite loop */
 //  for(;;)
 //  {
-//     __nop();
-//    HAL_UART_Transmit(&huart2, (uint8_t*) "Hallo Alex\r\n", 12, 0xffff);
-//    HAL_GPIO_TogglePin(GPIOA,  GPIO_PIN_5 );
+////     __nop();
+////    HAL_UART_Transmit(&huart2, (uint8_t*) "Hallo Alex\r\n", 12, 0xffff);
+////    HAL_GPIO_TogglePin(GPIOA,  GPIO_PIN_5 );
 //    
 //    osDelay(500);
 //  }
-  /* USER CODE END 5 */
-}
+//  /* USER CODE END 5 */
+//}
 
  /**
   * @brief  Period elapsed callback in non blocking mode

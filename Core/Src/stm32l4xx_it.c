@@ -23,6 +23,9 @@
 #include "stm32l4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+
+#include "rtos_debug.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -32,6 +35,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
+#define __HAL_DMA_SET_COUNTER(__HANDLE__, __COUNTER__) ((__HANDLE__)->Instance->CNDTR= (uint16_t)(__COUNTER__))
 
 /* USER CODE END PD */
 
@@ -53,6 +58,8 @@
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+extern uint8_t rxBuffer[1024];
+
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
@@ -61,6 +68,12 @@ extern UART_HandleTypeDef huart2;
 extern TIM_HandleTypeDef htim4;
 
 /* USER CODE BEGIN EV */
+
+extern osMessageQueueId_t que_id;
+
+uint16_t rxBufLen;
+extern MY_STRUCT *str_tr;
+osStatus status;
 
 /* USER CODE END EV */
 
@@ -196,10 +209,40 @@ void TIM4_IRQHandler(void)
 void USART2_IRQHandler(void)
 {
   /* USER CODE BEGIN USART2_IRQn 0 */
-
+ //str_recv = pvPortMalloc(sizeof(MY_STRUCT)); 
+ // __nop();
   /* USER CODE END USART2_IRQn 0 */
-  HAL_UART_IRQHandler(&huart2);
+  //HAL_UART_IRQHandler(&huart2);
   /* USER CODE BEGIN USART2_IRQn 1 */
+  
+  if(__HAL_UART_GET_FLAG(&huart2, UART_FLAG_IDLE) != RESET)
+	{
+		__HAL_UART_CLEAR_FLAG(&huart2, UART_FLAG_IDLE);
+		
+		__HAL_DMA_DISABLE(&hdma_usart2_rx);
+    
+		rxBufLen = 1024 - __HAL_DMA_GET_COUNTER(&hdma_usart2_rx);
+    
+    str_tr = pvPortMalloc(sizeof(MY_STRUCT)); 
+    //str_tr = (MY_STRUCT*)malloc(sizeof(MY_STRUCT));
+    __nop();
+    if(str_tr!=NULL){      
+      
+      memcpy(str_tr, rxBuffer, sizeof(rxBuffer));
+      status = osMessageQueuePut(que_id, str_tr, NULL, 0);
+    
+      memset(str_tr, 0, sizeof(rxBuffer));
+      
+      vPortFree(str_tr);
+      //free(str_tr);
+    }      
+    
+		__HAL_DMA_SET_COUNTER(&hdma_usart2_rx, 1024);
+		__HAL_DMA_ENABLE(&hdma_usart2_rx);
+       
+	}
+  
+  //vPortFree(str_recv);
 
   /* USER CODE END USART2_IRQn 1 */
 }
