@@ -49,12 +49,12 @@ DMA_HandleTypeDef hdma_usart2_rx;
 
 /* Definitions for defaultTask */
 
-//osThreadId_t defaultTaskHandle;
-//const osThreadAttr_t defaultTask_attributes = {
-//  .name = "defaultTask",
-//  .priority = (osPriority_t) osPriorityNormal,
-//  .stack_size = 128 * 4
-//};
+osThreadId_t defaultTaskHandle;
+const osThreadAttr_t defaultTask_attributes = {
+  .name = "defaultTask",
+  .priority = (osPriority_t) osPriorityNormal,
+  .stack_size = 128
+};
 
 /* USER CODE BEGIN PV */
 
@@ -66,14 +66,19 @@ static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_USART2_UART_Init(void);
 
-//void StartDefaultTask(void *argument);
+void StartDefaultTask(void *argument);
 
 /* USER CODE BEGIN PFP */
+
+extern osMessageQueueId_t que_id;
+extern osSemaphoreId_t sem_tim;
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+uint32_t flags;
 
 /* USER CODE END 0 */
 
@@ -135,13 +140,13 @@ int main(void)
 
   /* Create the thread(s) */
   /* creation of defaultTask */
-  //defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   
   
-  USER_Usart2_Init();
+  //USER_Usart2_Init();
   
   
   /* USER CODE END RTOS_THREADS */
@@ -318,20 +323,37 @@ static void MX_GPIO_Init(void)
   * @retval None
   */
 /* USER CODE END Header_StartDefaultTask */
-//void StartDefaultTask(void *argument)
-//{
-//  /* USER CODE BEGIN 5 */
-//  /* Infinite loop */
-//  for(;;)
-//  {
-////     __nop();
-////    HAL_UART_Transmit(&huart2, (uint8_t*) "Hallo Alex\r\n", 12, 0xffff);
-////    HAL_GPIO_TogglePin(GPIOA,  GPIO_PIN_5 );
-//    
-//    osDelay(500);
-//  }
-//  /* USER CODE END 5 */
-//}
+void StartDefaultTask(void *argument)
+{
+  /* USER CODE BEGIN 5 */
+  /* Infinite loop */
+  osStatus_t  staus_que, status_sem;
+  MY_STRUCT *str_2;
+  uint8_t flag_error = 0;
+  //uint32_t flags;
+  //osSemaphoreAcquire(sem_tim, osWaitForever);
+  for(;;)
+  {
+    flags = osThreadFlagsWait(0x0002U, osFlagsWaitAny, osWaitForever); 
+    if(flags == 0x0002U){
+      str_2 = pvPortMalloc(sizeof(MY_STRUCT));  
+    
+      if(str_2!=NULL){
+        staus_que = osMessageQueueGet(que_id, str_2, 0U, osWaitForever);
+        if(staus_que == osOK){
+          HAL_UART_Transmit(&huart2, (uint8_t*)&str_2->buff[0], sizeof(str_2->buff[0]), 0xffff);
+          HAL_UART_Transmit(&huart2, (uint8_t*)&str_2->buff_5[240], sizeof(str_2->buff_5[240]), 0xffff);
+          vPortFree(str_2);     
+        }
+        else{
+          flag_error = 1;          
+        }      
+      }
+    }
+    osThreadYield();   
+  }
+  /* USER CODE END 5 */
+}
 
  /**
   * @brief  Period elapsed callback in non blocking mode

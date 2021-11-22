@@ -18,7 +18,7 @@ extern "C" {
 extern UART_HandleTypeDef huart2;
 extern DMA_HandleTypeDef hdma_usart2_rx;
 
-//void StartTask1(void *argument);
+void StartTask1(void *argument);
 void StartTask2(void *argument);
 
 void periodic_Callback(void *argument);
@@ -33,10 +33,10 @@ void USER_Usart2_Init(void);
 typedef struct{
 	
   uint8_t buff[1024];
-  //uint8_t buff_2[1024];
-  //uint8_t buff_3[1024];
+  uint8_t buff_2[1024];
+  uint8_t buff_3[1024];
   //uint8_t buff_4[1024];
-  //uint8_t buff_5[1024];
+  uint8_t buff_5[1024];
 		
 }MY_STRUCT;
 

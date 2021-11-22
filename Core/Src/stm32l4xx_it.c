@@ -215,32 +215,32 @@ void USART2_IRQHandler(void)
   //HAL_UART_IRQHandler(&huart2);
   /* USER CODE BEGIN USART2_IRQn 1 */
   
-  if(__HAL_UART_GET_FLAG(&huart2, UART_FLAG_IDLE) != RESET)
-	{
-		__HAL_UART_CLEAR_FLAG(&huart2, UART_FLAG_IDLE);
-		
-		__HAL_DMA_DISABLE(&hdma_usart2_rx);
-    
-		rxBufLen = 1024 - __HAL_DMA_GET_COUNTER(&hdma_usart2_rx);
-    
-    str_tr = pvPortMalloc(sizeof(MY_STRUCT)); 
-    //str_tr = (MY_STRUCT*)malloc(sizeof(MY_STRUCT));
-    __nop();
-    if(str_tr!=NULL){      
-      
-      memcpy(str_tr, rxBuffer, sizeof(rxBuffer));
-      status = osMessageQueuePut(que_id, str_tr, NULL, 0);
-    
-      memset(str_tr, 0, sizeof(rxBuffer));
-      
-      vPortFree(str_tr);
-      //free(str_tr);
-    }      
-    
-		__HAL_DMA_SET_COUNTER(&hdma_usart2_rx, 1024);
-		__HAL_DMA_ENABLE(&hdma_usart2_rx);
-       
-	}
+//  if(__HAL_UART_GET_FLAG(&huart2, UART_FLAG_IDLE) != RESET)
+//	{
+//		__HAL_UART_CLEAR_FLAG(&huart2, UART_FLAG_IDLE);
+//		
+//		__HAL_DMA_DISABLE(&hdma_usart2_rx);
+//    
+//		rxBufLen = 1024 - __HAL_DMA_GET_COUNTER(&hdma_usart2_rx);
+//    
+//    str_tr = pvPortMalloc(sizeof(MY_STRUCT)); 
+//    //str_tr = (MY_STRUCT*)malloc(sizeof(MY_STRUCT));
+//    __nop();
+//    if(str_tr!=NULL){      
+//      
+//      memcpy(str_tr, rxBuffer, sizeof(rxBuffer));
+//      status = osMessageQueuePut(que_id, str_tr, NULL, 0);
+//    
+//      memset(str_tr, 0, sizeof(rxBuffer));
+//      
+//      vPortFree(str_tr);
+//      //free(str_tr);
+//    }      
+//    
+//		__HAL_DMA_SET_COUNTER(&hdma_usart2_rx, 1024);
+//		__HAL_DMA_ENABLE(&hdma_usart2_rx);
+//       
+//	}
   
   //vPortFree(str_recv);
 
