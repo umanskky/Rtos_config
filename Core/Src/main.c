@@ -26,7 +26,8 @@
 /* USER CODE BEGIN Includes */
 
 #include "rtos_debug.h"
-
+#include "EventRecorder.h"          
+      
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -90,6 +91,8 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 
+	
+	
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -105,6 +108,8 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
+	
+	EventRecorderInitialize(EventRecordAll, 1);
 
   /* USER CODE END SysInit */
 
@@ -115,6 +120,8 @@ int main(void)
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
   
+	
+	
   Task_init();
   
   /* USER CODE END 2 */
@@ -161,6 +168,9 @@ int main(void)
   /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+	
+	
+	
   while (1)
   {
     /* USER CODE END WHILE */
