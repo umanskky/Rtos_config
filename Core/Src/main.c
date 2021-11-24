@@ -26,7 +26,7 @@
 /* USER CODE BEGIN Includes */
 
 #include "rtos_debug.h"
-#include "EventRecorder.h"          
+//#include "EventRecorder.h"          
       
 /* USER CODE END Includes */
 
@@ -51,9 +51,9 @@ DMA_HandleTypeDef hdma_usart2_rx;
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
-  .name = "defaultTask",
+  .name = "Reciver",
+  .stack_size = 128,
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 128 * 4
 };
 /* USER CODE BEGIN PV */
 
@@ -106,7 +106,7 @@ int main(void)
 
   /* USER CODE BEGIN SysInit */
 	
-	EventRecorderInitialize(EventRecordAll, 1);
+	//EventRecorderInitialize(EventRecordAll, 1);
 
   /* USER CODE END SysInit */
 
@@ -187,8 +187,13 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
+  /** Configure the main internal regulator output voltage
+  */
+  if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK)
+  {
+    Error_Handler();
+  }
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
@@ -215,18 +220,6 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2;
-  PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
-  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Configure the main internal regulator output voltage
-  */
-  if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK)
   {
     Error_Handler();
   }
@@ -341,8 +334,8 @@ void StartDefaultTask(void *argument)
   //osSemaphoreAcquire(sem_tim, osWaitForever);
   for(;;)
   {
-    flags = osThreadFlagsWait(0x0002U, osFlagsWaitAny, osWaitForever); 
-    if(flags == 0x0002U){
+    //flags = osThreadFlagsWait(0x0002U, osFlagsWaitAny, osWaitForever); 
+    //if(flags == 0x0002U){
       str_2 = pvPortMalloc(sizeof(MY_STRUCT));  
     
       if(str_2!=NULL){
@@ -350,19 +343,24 @@ void StartDefaultTask(void *argument)
         if(staus_que == osOK){
           HAL_UART_Transmit(&huart2, (uint8_t*)&str_2->buff[0], sizeof(str_2->buff[0]), 0xffff);
           HAL_UART_Transmit(&huart2, (uint8_t*)&str_2->buff_5[240], sizeof(str_2->buff_5[240]), 0xffff);
+					HAL_UART_Transmit(&huart2, (uint8_t*)&str_2->buff_5[3], sizeof(str_2->buff_5[3]), 0xffff);
+					//HAL_UART_Transmit(&huart2, (uint8_t*)str_2->buff_4, strlen(str_2->buff_4), 0xffff);
           vPortFree(str_2);     
         }
         else{
-          flag_error = 1;          
+          flag_error = 1; 
+					vPortFree(str_2);
         }      
       }
-    }
-    osThreadYield();   
+			//vPortFree(str_2);
+    //}
+		osDelay(200);
+    //osThreadYield();   
   }
   /* USER CODE END 5 */
 }
 
- /**
+/**
   * @brief  Period elapsed callback in non blocking mode
   * @note   This function is called  when TIM4 interrupt took place, inside
   * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment

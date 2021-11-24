@@ -7,6 +7,7 @@ uint16_t size;
 uint8_t flag_error = 0;
 
 uint8_t rxBuffer[1024];
+char str_5[100];
 
 //*** defines****
 
@@ -36,13 +37,13 @@ osMessageQueueId_t que_id;
 
 //*****************************************
 const osThreadAttr_t Task1_attributes = {
-  .name = "defaultTask",
+  .name = "Sender_1",
   .priority = (osPriority_t) osPriorityNormal,  //osPriorityHigh
   .stack_size = 128
 };
 
 const osThreadAttr_t Task2_attributes = {
-  .name = "defaultTask_2",
+  .name = "Sender_2",
   .priority = (osPriority_t) osPriorityNormal, //osPriorityHigh
   .stack_size = 128
 };
@@ -101,7 +102,8 @@ void StartTask1(void *argument)
       flags = osThreadFlagsSet(defaultTaskHandle, 0x0002U);      
     }
     else{
-      flag_error = 1;    //exec();      
+      flag_error = 1;    //exec(); 
+			vPortFree(str);
     } 
 
     //osSemaphoreRelease(sem_tim);  
@@ -115,54 +117,24 @@ void StartTask1(void *argument)
 
 void StartTask2(void *argument)
 {
-//  osStatus_t  staus_que;
-//  MY_STRUCT *str_2;
-  
+	MY_STRUCT* strp;
+ 
   for(;;)
   {
-//    str_2 = pvPortMalloc(sizeof(MY_STRUCT));  
-//    
-//		if(str_2!=NULL){
-//      staus_que = osMessageQueueGet(que_id, str_2, 0U, osWaitForever);
-//      if(staus_que == osOK){
-//        HAL_UART_Transmit(&huart2, (uint8_t*)&str_2->buff[0], sizeof(str_2->buff[0]), 0xffff);
-//        HAL_UART_Transmit(&huart2, (uint8_t*)&str_2->buff_5[240], sizeof(str_2->buff_5[240]), 0xffff);
-//        vPortFree(str_2);     
-//      }
-//      else{
-//        flag_error = 1;          
-//      }      
-//    }
-		osDelay(1);   
+		strp = pvPortMalloc(sizeof(MY_STRUCT));
+		if(strp!=NULL){
+			//vTaskList(strp->buff_4);
+			strp->buff_5[3] = 0xff;
+			osMessageQueuePut(que_id, strp, 0U, osWaitForever);
+			__nop();
+		
+			vPortFree(strp);
+		}
+		//vPortFree(strp);
+		osDelay(500);   
   } 
 }
 
-//void StartTask2(void *argument)
-//{
-//  osStatus_t  staus_que;
-//  MY_STRUCT *str_recv;
-//  
-//  for(;;)
-//  {
-//    __nop();
-//    
-//    str_recv = pvPortMalloc(sizeof(MY_STRUCT));  
-//    //str_tr = malloc(sizeof(MY_STRUCT)); 
-//    
-//		if(str_tr!=NULL){
-//      staus_que = osMessageQueueGet(que_id, str_recv, 0U, osWaitForever);
-//      if(staus_que == osOK){
-//        HAL_UART_Transmit(&huart2, (uint8_t*)&str_recv->buff, strlen((char*)&str_recv->buff), 0xffff);
-//        vPortFree(str_recv);  
-//        //free(str_tr);
-//      }
-//      else{
-//        flag_error = 1;          
-//      }      
-//    }
-//		osDelay(500);   
-//  } 
-//}
 
 //*****************************************
 

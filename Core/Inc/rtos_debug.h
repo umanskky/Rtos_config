@@ -13,7 +13,7 @@ extern "C" {
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
-
+#include "cmsis_os2.h"
 
 extern UART_HandleTypeDef huart2;
 extern DMA_HandleTypeDef hdma_usart2_rx;
@@ -32,10 +32,11 @@ void USER_Usart2_Init(void);
 
 typedef struct{
 	
+	char    buff_4[100];
   uint8_t buff[1024];
   uint8_t buff_2[1024];
   uint8_t buff_3[1024];
-  //uint8_t buff_4[1024];
+  
   uint8_t buff_5[1024];
 		
 }MY_STRUCT;
