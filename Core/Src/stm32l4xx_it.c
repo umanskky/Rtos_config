@@ -212,7 +212,7 @@ void USART2_IRQHandler(void)
  //str_recv = pvPortMalloc(sizeof(MY_STRUCT)); 
  // __nop();
   /* USER CODE END USART2_IRQn 0 */
-  //HAL_UART_IRQHandler(&huart2);
+  HAL_UART_IRQHandler(&huart2);
   /* USER CODE BEGIN USART2_IRQn 1 */
   
 //  if(__HAL_UART_GET_FLAG(&huart2, UART_FLAG_IDLE) != RESET)

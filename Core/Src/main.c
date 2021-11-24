@@ -49,14 +49,12 @@ UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_usart2_rx;
 
 /* Definitions for defaultTask */
-
 osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
   .name = "defaultTask",
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 128
+  .stack_size = 128 * 4
 };
-
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -66,7 +64,6 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_USART2_UART_Init(void);
-
 void StartDefaultTask(void *argument);
 
 /* USER CODE BEGIN PFP */
@@ -109,7 +106,7 @@ int main(void)
 
   /* USER CODE BEGIN SysInit */
 	
-	//EventRecorderInitialize(EventRecordAll, 1);
+	EventRecorderInitialize(EventRecordAll, 1);
 
   /* USER CODE END SysInit */
 
