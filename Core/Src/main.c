@@ -109,7 +109,7 @@ int main(void)
 
   /* USER CODE BEGIN SysInit */
 	
-	EventRecorderInitialize(EventRecordAll, 1);
+	//EventRecorderInitialize(EventRecordAll, 1);
 
   /* USER CODE END SysInit */
 
