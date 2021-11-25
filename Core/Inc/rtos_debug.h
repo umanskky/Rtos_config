@@ -18,8 +18,10 @@ extern "C" {
 extern UART_HandleTypeDef huart2;
 extern DMA_HandleTypeDef hdma_usart2_rx;
 
-void StartTask1(void *argument);
-void StartTask2(void *argument);
+void Sender1(void *argument);
+void Sender2(void *argument);
+void Reciver(void *argument);
+void Timer(void *argument);
 
 void periodic_Callback(void *argument);
 
@@ -32,14 +34,21 @@ void USER_Usart2_Init(void);
 
 typedef struct{
 	
-	char    buff_4[100];
-  uint8_t buff[1024];
-  uint8_t buff_2[1024];
-  uint8_t buff_3[1024];
+	char    buff[1024];
+  //uint8_t buff[1024];
+  //uint8_t buff_2[1024];
+  //uint8_t buff_3[1024];
   
-  uint8_t buff_5[1024];
+  //uint8_t buff_5[1024];
 		
 }MY_STRUCT;
+
+typedef struct{
+
+  char send_1[100];
+  char send_2[100];
+  
+}MY_SENDER;
 
 #pragma pack(pop)
 

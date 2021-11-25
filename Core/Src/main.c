@@ -51,7 +51,7 @@ DMA_HandleTypeDef hdma_usart2_rx;
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
-  .name = "Reciver",
+  .name = "Rec",
   .stack_size = 128,
   .priority = (osPriority_t) osPriorityNormal,
 };
@@ -117,8 +117,7 @@ int main(void)
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
   
-	
-	
+  //USER_Usart2_Init();
   Task_init();
   
   /* USER CODE END 2 */
@@ -327,35 +326,14 @@ void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
-  osStatus_t  staus_que, status_sem;
-  MY_STRUCT *str_2;
-  uint8_t flag_error = 0;
-  //uint32_t flags;
-  //osSemaphoreAcquire(sem_tim, osWaitForever);
+
+  USER_Usart2_Init();
+  
   for(;;)
   {
-    //flags = osThreadFlagsWait(0x0002U, osFlagsWaitAny, osWaitForever); 
-    //if(flags == 0x0002U){
-      str_2 = pvPortMalloc(sizeof(MY_STRUCT));  
-    
-      if(str_2!=NULL){
-        staus_que = osMessageQueueGet(que_id, str_2, 0U, osWaitForever);
-        if(staus_que == osOK){
-          HAL_UART_Transmit(&huart2, (uint8_t*)&str_2->buff[0], sizeof(str_2->buff[0]), 0xffff);
-          HAL_UART_Transmit(&huart2, (uint8_t*)&str_2->buff_5[240], sizeof(str_2->buff_5[240]), 0xffff);
-					HAL_UART_Transmit(&huart2, (uint8_t*)&str_2->buff_5[3], sizeof(str_2->buff_5[3]), 0xffff);
-					//HAL_UART_Transmit(&huart2, (uint8_t*)str_2->buff_4, strlen(str_2->buff_4), 0xffff);
-          vPortFree(str_2);     
-        }
-        else{
-          flag_error = 1; 
-					vPortFree(str_2);
-        }      
-      }
-			//vPortFree(str_2);
-    //}
-		osDelay(200);
-    //osThreadYield();   
+ 
+		osDelay(1);
+     
   }
   /* USER CODE END 5 */
 }
