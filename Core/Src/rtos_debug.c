@@ -205,7 +205,7 @@ void Timer(void *argument)
     status = osSemaphoreAcquire(sem_tim, 0U);
     if(status == osOK)
     {
-      HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+      //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
     }
     
     
@@ -217,25 +217,28 @@ void Timer(void *argument)
 
 void Button(void *argument)
 {
-  //uint8_t k;
+  uint8_t k;
   
   for(;;)
   {
-//    if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_RESET)
-//    {
-//      while(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_RESET){vTaskDelay(500);}
-//      k=1;
-//      if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_SET && k)
-//        __nop();
-//    }
+    if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_RESET)
+    {
+      while(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_RESET){vTaskDelay(50);}
+      k=1;
+      if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_SET && k)
+      {
+        __nop();
+        HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+      }
+    }
 
-//    if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_SET)
-//    {
-//      while(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_SET){vTaskDelay(500);}
-//      k=0;
-//    } 
+    if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_SET)
+    {
+      while(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_SET){vTaskDelay(50);}
+      k=0;
+    } 
     
-    osDelay(100);
+    osDelay(20);
   }  
 }
 
