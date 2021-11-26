@@ -22,6 +22,7 @@ void Sender1(void *argument);
 void Sender2(void *argument);
 void Reciver(void *argument);
 void Timer(void *argument);
+void Button(void *argument);
 
 void periodic_Callback(void *argument);
 

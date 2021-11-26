@@ -2443,7 +2443,7 @@ __WEAK void vApplicationStackOverflowHook (TaskHandle_t xTask, signed char *pcTa
   (void)xTask;
   (void)pcTaskName;
   configASSERT(0);
-} 
+}
 #endif
 
 /*---------------------------------------------------------------------------*/

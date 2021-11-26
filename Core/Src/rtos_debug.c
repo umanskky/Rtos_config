@@ -19,6 +19,7 @@ osThreadId_t TaskSender1;
 osThreadId_t TaskSender2;
 osThreadId_t TaskReciver;
 osThreadId_t TaskTimer;
+osThreadId_t TaskButton;
 
 //*** Timer *****
 osTimerId_t tim_periodic;
@@ -65,6 +66,12 @@ const osThreadAttr_t TaskTimer_attributes = {
   .priority = (osPriority_t) osPriorityNormal, //osPriorityHigh
   .stack_size = 128
 };
+
+const osThreadAttr_t TaskButton_attributes = {
+  .name = "TaskButton",
+  .priority = (osPriority_t) osPriorityNormal, //osPriorityHigh
+  .stack_size = 128
+};
 //*****************************************
 
 MY_STRUCT str;
@@ -75,7 +82,8 @@ void Task_init(void)
   TaskSender1 = osThreadNew(Sender1, NULL, &TaskSender1_attributes);
   TaskSender2 = osThreadNew(Sender2, NULL, &TaskSender2_attributes);
   TaskReciver = osThreadNew(Reciver, NULL, &TaskReciver_attributes);
-  TaskTimer   = osThreadNew(Timer, NULL, &TaskTimer_attributes);
+  TaskTimer   = osThreadNew(Timer,   NULL, &TaskTimer_attributes  );
+  TaskButton  = osThreadNew(Button,  NULL, &TaskButton_attributes );
   
   tim_periodic = osTimerNew(periodic_Callback, osTimerPeriodic,(void*) 0, NULL );
   
@@ -202,6 +210,32 @@ void Timer(void *argument)
     
     
     osDelay(1);
+  }  
+}
+
+//*****************************************
+
+void Button(void *argument)
+{
+  //uint8_t k;
+  
+  for(;;)
+  {
+//    if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_RESET)
+//    {
+//      while(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_RESET){vTaskDelay(500);}
+//      k=1;
+//      if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_SET && k)
+//        __nop();
+//    }
+
+//    if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_SET)
+//    {
+//      while(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_SET){vTaskDelay(500);}
+//      k=0;
+//    } 
+    
+    osDelay(100);
   }  
 }
 
