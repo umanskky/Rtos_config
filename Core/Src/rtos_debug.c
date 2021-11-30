@@ -23,6 +23,7 @@ osThreadId_t TaskButton;
 
 //*** Timer *****
 osTimerId_t tim_periodic;
+osTimerId_t tim_oneshot;
 
 //*** Semafore ******
 osSemaphoreId_t sem_tim;
@@ -86,6 +87,7 @@ void Task_init(void)
   TaskButton  = osThreadNew(Button,  NULL, &TaskButton_attributes );
   
   tim_periodic = osTimerNew(periodic_Callback, osTimerPeriodic,(void*) 0, NULL );
+  tim_oneshot = osTimerNew(oneshot_Callback, osTimerOnce,(void*) 0, NULL );
   
   sem_tim = osSemaphoreNew(1, 1, NULL);
   sem_clb = osSemaphoreNew(1, 1, NULL);
@@ -198,11 +200,11 @@ void Timer(void *argument)
 {
   osStatus_t status;
   osTimerStart(tim_periodic, TIME_DELAY);
-  osSemaphoreAcquire(sem_tim, 0U);
+  //osSemaphoreAcquire(sem_tim, 0U);
   
   for(;;)
   {
-    status = osSemaphoreAcquire(sem_tim, 0U);
+    //status = osSemaphoreAcquire(sem_tim, 0U);
     if(status == osOK)
     {
       //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
@@ -215,30 +217,92 @@ void Timer(void *argument)
 
 //*****************************************
 
+//void Button(void *argument)
+//{
+//  uint8_t k;
+//  osStatus_t status;
+//  osSemaphoreAcquire(sem_clb, 0U);
+//  
+//  for(;;)
+//  {
+//    status = osSemaphoreAcquire(sem_clb, 0U);
+//    __nop();
+//    if(status==osOK)
+//    {
+//      __nop();
+//      HAL_NVIC_DisableIRQ(EXTI15_10_IRQn);
+//      if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_RESET)
+//      {
+//        while(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_RESET){vTaskDelay(50);}
+//        k=1;
+//        if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_SET && k)
+//        {
+//          __nop();
+//          HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+//          HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+//        }
+//      }
+//    }
+//    else HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+
+////    if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_RESET)
+////    {
+////      while(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_RESET){vTaskDelay(50);}
+////      k=0;
+////    } 
+//    
+//    osDelay(1000);
+//  }  
+//}
+
+//*****************************************
+
 void Button(void *argument)
 {
-  uint8_t k;
+  uint8_t isISR = 1;
+  uint8_t st;
+  uint8_t st_btn = 1;
+  osStatus_t status;
+  
+  osSemaphoreAcquire(sem_clb, 100);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
   
   for(;;)
   {
-    if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_RESET)
+    HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+    status = osSemaphoreAcquire(sem_clb, 0U);
+    __nop();
+    if(status == osOK)
     {
-      while(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_RESET){vTaskDelay(50);}
-      k=1;
-      if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_SET && k)
+      HAL_NVIC_DisableIRQ(EXTI15_10_IRQn);
+      st = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13);
+      if(st!=st_btn)
       {
-        __nop();
-        HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+        st_btn = st;
+        if(st == 0)
+        {
+          //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+          //HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+          __nop();
+        }
+        else
+        {
+          __nop();
+          //HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+          HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+        }
       }
     }
-
-    if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_SET)
-    {
-      while(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_SET){vTaskDelay(50);}
-      k=0;
-    } 
+//      if(st == 1)
+//      {
+//        HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+//        isISR = 1;
+//      }
+      
     
-    osDelay(20);
+   
+    
+    osDelay(10);
   }  
 }
 
@@ -246,7 +310,25 @@ void Button(void *argument)
 
 void periodic_Callback(void *argument)
 {
-  osSemaphoreRelease(sem_tim);
+  //osSemaphoreRelease(sem_tim);
+}
+
+//*****************************************
+
+void oneshot_Callback(void *argument)
+{
+//  //osSemaphoreRelease(sem_tim);
+//  
+//  if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_RESET)
+//  {
+//          //k = 1;
+//    if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_SET)
+//    {
+//      __nop();
+//      HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+//    }          
+//  }
+//  
 }
 
 //*****************************************

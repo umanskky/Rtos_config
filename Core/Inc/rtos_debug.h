@@ -24,7 +24,8 @@ void Reciver(void *argument);
 void Timer(void *argument);
 void Button(void *argument);
 
-void periodic_Callback(void *argument);
+void periodic_Callback(void *argument); 
+void oneshot_Callback(void *argument); //oneshot_Callback
 
 void Task_init(void);
 void USER_Usart2_Init(void);
