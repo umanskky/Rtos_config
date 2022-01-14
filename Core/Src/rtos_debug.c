@@ -167,6 +167,8 @@ void Reciver(void *argument)
 	MY_SENDER* strp;
   osStatus_t status_que, status_sem;
   
+//  char *str = "Button \n";
+  
   osSemaphoreAcquire(sem_clb, 0U);
  
   for(;;)
@@ -184,10 +186,10 @@ void Reciver(void *argument)
     }
     
     
-    if(status_sem == osOK)
-    {
-      HAL_UART_Transmit(&huart2, (uint8_t*)str.buff, strlen(str.buff), 0xffff);
-    }
+//    if(status_sem == osOK)
+//    {
+//      HAL_UART_Transmit(&huart2, (uint8_t*)str, strlen(str), 0xffff);
+//    }
      
     //osThreadYield();
 		osDelay(1);   
@@ -217,94 +219,96 @@ void Timer(void *argument)
 
 //*****************************************
 
-//void Button(void *argument)
-//{
-//  uint8_t k;
-//  osStatus_t status;
-//  osSemaphoreAcquire(sem_clb, 0U);
-//  
-//  for(;;)
-//  {
-//    status = osSemaphoreAcquire(sem_clb, 0U);
-//    __nop();
-//    if(status==osOK)
-//    {
-//      __nop();
-//      HAL_NVIC_DisableIRQ(EXTI15_10_IRQn);
-//      if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_RESET)
-//      {
-//        while(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_RESET){vTaskDelay(50);}
-//        k=1;
-//        if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_SET && k)
-//        {
-//          __nop();
-//          HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-//          HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
-//        }
-//      }
-//    }
-//    else HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
-
-////    if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_RESET)
-////    {
-////      while(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_RESET){vTaskDelay(50);}
-////      k=0;
-////    } 
-//    
-//    osDelay(1000);
-//  }  
-//}
-
-//*****************************************
-
 void Button(void *argument)
 {
-  uint8_t isISR = 1;
-  uint8_t st;
-  uint8_t st_btn = 1;
+  uint8_t k;
   osStatus_t status;
+  char *str = "Button \n";
   
-  osSemaphoreAcquire(sem_clb, 100);
-  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+  osSemaphoreAcquire(sem_clb, 0U);
   
   for(;;)
   {
-    HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
     status = osSemaphoreAcquire(sem_clb, 0U);
     __nop();
-    if(status == osOK)
+    if(status==osOK)
     {
+      __nop();
       HAL_NVIC_DisableIRQ(EXTI15_10_IRQn);
-      st = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13);
-      if(st!=st_btn)
+      if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_RESET)
       {
-        st_btn = st;
-        if(st == 0)
-        {
-          //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-          //HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
-          __nop();
-        }
-        else
+        while(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_RESET){vTaskDelay(50);}
+        k=1;
+        if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_SET && k)
         {
           __nop();
-          //HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
           HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+          HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
         }
       }
     }
-//      if(st == 1)
-//      {
-//        HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
-//        isISR = 1;
-//      }
-      
-    
-   
+    else HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+
+//    if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_RESET)
+//    {
+//      while(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)==GPIO_PIN_RESET){vTaskDelay(50);}
+//      k=0;
+//    } 
     
     osDelay(10);
   }  
 }
+
+//*****************************************
+
+//void Button(void *argument)
+//{
+//  uint8_t isISR = 1;
+//  uint8_t st;
+//  uint8_t st_btn = 1;
+//  osStatus_t status;
+//  
+//  osSemaphoreAcquire(sem_clb, 0);
+//  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+//  
+//  for(;;)
+//  {
+//    HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+//    status = osSemaphoreAcquire(sem_clb, 0U);
+//    __nop();
+//    if(status == osOK)
+//    {
+//      HAL_NVIC_DisableIRQ(EXTI15_10_IRQn);
+//      st = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13);
+//      if(st!=st_btn)
+//      {
+//        st_btn = st;
+//        if(st == 0)
+//        {
+//          //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+//          //HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+//          __nop();
+//        }
+//        else
+//        {
+//          __nop();
+//          HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+//          HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+//        }
+//      }
+//    }
+////      if(st == 1)
+////      {
+////        HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+////        isISR = 1;
+////      }
+      
+    
+   
+    
+//    osDelay(10);
+//  }  
+//}
 
 //*****************************************
 
